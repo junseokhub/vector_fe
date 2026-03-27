@@ -3,7 +3,7 @@ import client from "@/api/client";
 import { storage } from "@/lib/storage";
 import type { Project } from "@/types";
 
-export function useGetAllProject(userId: number) {
+export function useGetAllMyProject(userId: number) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +13,7 @@ export function useGetAllProject(userId: number) {
     if (!token) { setError("로그인이 필요합니다."); setLoading(false); return; }
 
     client
-      .post("/api/invite/list", { json: { userId } })
+      .get(`/api/invite/list/my?userId=${userId}`)
       .json<Project[]>()
       .then(setProjects)
       .catch((e) => setError((e as Error).message))

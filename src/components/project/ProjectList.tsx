@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { authState } from "@/state/authAtom";
 import { projectKeyState } from "@/state/projectAtom";
-import { useGetAllProject } from "@/hooks/project/useGetAllProject";
+import { useGetAllMyProject } from "@/hooks/project/userGetAllMyProject";
 import { useCreateProject } from "@/hooks/project/useCreateProject";
 import ProjectCreateModal from "./ProjectCreateModal";
 import type { Project } from "@/types";
 
 export default function ProjectList() {
   const { id: userId } = useRecoilValue(authState);
-  const { projects, setProjects, loading, error } = useGetAllProject(userId);
+  const { projects, setProjects, loading, error } = useGetAllMyProject(userId);
   const { handleSubmit } = useCreateProject(userId, setProjects);
   const setSelectedProjectKey = useSetRecoilState(projectKeyState);
   const [isModalOpen, setIsModalOpen] = useState(false);
