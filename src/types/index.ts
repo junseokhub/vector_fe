@@ -5,13 +5,36 @@ export interface AuthState {
   email: string;
 }
 
-export interface LoginParams { email: string; password: string }
-export interface LoginResponse { accessToken: string; id: number; email: string; username: string; role: string }
+export interface LoginParams { 
+  email: string;
+  password: string
+}
 
-export interface SignUpParams { username: string; email: string; password: string }
-export interface UserResponse { id: number; email: string; username: string; role: string; loginAt?: string; createdAt?: string; updatedAt?: string }
+export interface LoginResponse {
+  accessToken: string;
+  id: number; 
+  email: string; 
+  username: string; 
+  role: string
+ }
 
-// ─── Project ─────────────────────────────────────────────────────────────────
+export interface SignUpParams {
+   username: string; 
+   email: string; 
+   password: string 
+}
+
+export interface UserResponse {
+   id: number; 
+   email: string; 
+   username: string; 
+   role: string; 
+   loginAt?: string; 
+   createdAt?: string; 
+   updatedAt?: string 
+}
+
+
 export interface Project {
   id: number; name: string; key: string;
   prompt?: string; embedModel?: string; chatModel?: string; openAiKey?: string;
@@ -19,7 +42,11 @@ export interface Project {
   createdAt: string; updatedAt: string; mine?: string;
 }
 
-export interface CreateProjectParams { name: string; createdUserId: number; dimensions: number }
+export interface CreateProjectParams { 
+  name: string; 
+  createdUserId: number; 
+  dimensions: number 
+}
 
 export interface ProjectUpdateParams {
   name: string; openAiKey: string; prompt: string;
@@ -28,9 +55,6 @@ export interface ProjectUpdateParams {
 export interface ProjectUpdateResponse extends ProjectUpdateParams { key: string }
 
 export interface ProjectContentsDto {
-  id: number; key: string; name: string; prompt: string;
-  embedModel: string; chatModel: string; dimensions: number;
-  openAiKey: string; createdAt: string; updatedAt: string;
   contents: ContentDto[];
 }
 
@@ -41,8 +65,20 @@ export interface ContentDto {
   createdAt: string; updatedAt: string;
 }
 
-export interface ContentCreateParams { title: string; answer?: string; projectKey: string }
-export interface ContentUpdateParams { title: string; answer: string; updatedUserId: number }
+export interface ContentCreateParams {
+   title: string; 
+   answer?: string; 
+   projectKey: string 
+}
+
+export interface ContentUpdateParams {
+   title: string; 
+   answer: string; 
+   updatedUserId: number 
+  }
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
-export interface ChatMessage { role: "user" | "assistant"; text: string }
+export interface ChatMessage {
+   role: "user" | "assistant"; 
+   text: string 
+}

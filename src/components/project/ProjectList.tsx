@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { authState } from "@/state/authAtom";
 import { projectKeyState } from "@/state/projectAtom";
-import { useGetAllMyProject } from "@/hooks/project/userGetAllMyProject";
+import { useGetAllProject } from "@/hooks/project/useGetAllProject";
 import { useCreateProject } from "@/hooks/project/useCreateProject";
 import ProjectCreateModal from "./ProjectCreateModal";
 import type { Project } from "@/types";
 
 export default function ProjectList() {
   const { id: userId } = useRecoilValue(authState);
-  const { projects, setProjects, loading, error } = useGetAllMyProject(userId);
+  const { projects, setProjects, loading, error } = useGetAllProject(userId);
   const { handleSubmit } = useCreateProject(userId, setProjects);
   const setSelectedProjectKey = useSetRecoilState(projectKeyState);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,10 +24,10 @@ export default function ProjectList() {
   return (
     <div className="py-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800">프로젝트 목록</h1>
+        <h1 className="text-2xl font-bold text-slate-800 ml-60">프로젝트 목록</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]"
+          className="flex mr-60 items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]"
         >
           <span className="text-lg">+</span> 새 프로젝트
         </button>
@@ -40,7 +40,7 @@ export default function ProjectList() {
           <p className="text-sm mt-1">새로운 프로젝트를 만들어보세요.</p>
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="grid gap-3 max-w-7xl mx-auto px-4">
           {projects.map((p: Project) => (
             <div
               key={p.id}

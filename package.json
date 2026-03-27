@@ -17,7 +17,8 @@
     "react-dom": "18.2.0",
     "recoil": "^0.7.7",
     "recoil-nexus": "^0.5.1",
-    "recoil-persist": "^5.1.0"
+    "recoil-persist": "^5.1.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

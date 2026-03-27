@@ -1,14 +1,14 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
-
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
+RUN apk add --no-cache libc6-compat
+RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 COPY pnpm-lock.yaml package.json ./
-RUN apk add --no-cache libc6-compat && pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 FROM deps AS build
-COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG NEXT_PUBLIC_DEV_MODE=UI
+ENV NEXT_PUBLIC_DEV_MODE=$NEXT_PUBLIC_DEV_MODE
 RUN pnpm build
 
 FROM node:22-alpine AS runner

@@ -5,56 +5,57 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { useRecoilValue } from "recoil";
 import { authState } from "@/state/authAtom";
-import { useGetContentInProject } from "@/hooks/project/useGetContentInProject";
-import ProjectUpdateModal from "./ProjectUpdateModal";
+import { useGetContentInProject } from "@/hooks/content/useGetContentInProject";
+import { useGetProject } from "@/hooks/project/useGetProject";
+import ProjectUpdateModal from "../project/ProjectUpdateModal";
 import ContentCreateModal from "@/components/content/ContentCreateModal";
 import type { ContentDto } from "@/types";
 
 const ChatModal = dynamic(() => import("@/components/chat/ChatModal"), { ssr: false });
 
-export default function ProjectDetailContents({ projectKey }: { projectKey: string }) {
+export default function Conten({ projectKey }: { projectKey: string }) {
   const { id: userId } = useRecoilValue(authState);
-  const { projectContents, loading, error } = useGetContentInProject(projectKey);
+  const { contents, loading: contentsLoading, error: contentsError } = useGetContentInProject(projectKey);
+  const { project, loading: projectLoading, error: projectError } = useGetProject(projectKey);
   const router = useRouter();
 
   const [showUpdate, setShowUpdate] = useState(false);
   const [showCreateContent, setShowCreateContent] = useState(false);
   const [showChat, setShowChat] = useState(false);
 
-  if (loading) return <Status text="로딩중..." />;
-  if (error) return <Status text={`오류: ${error}`} isError />;
-  if (!projectContents) return <Status text="프로젝트를 찾을 수 없습니다." />;
+  if (contentsLoading || projectLoading) return <Status text="로딩중..." />;
+  if (contentsError) return <Status text={`오류: ${contentsError}`} isError />;
+  if (projectError) return <Status text={`오류: ${projectError}`} isError />;
+  if (!project) return <Status text="프로젝트를 찾을 수 없습니다." />;
 
-  const canChat = !!projectContents.openAiKey;
+  const canChat = !!project.openAiKey;
 
   return (
     <div className="py-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 pb-6 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">{projectContents.name}</h1>
-          <span className="text-xs font-mono text-slate-400 mt-1 block">Key: {projectContents.key}</span>
+          <h1 className="text-2xl font-bold text-slate-800">{project.name}</h1>
+          <span className="text-xs font-mono text-slate-400 mt-1 block">Key: {project.key}</span>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Btn onClick={() => setShowUpdate(true)} color="amber">수정하기</Btn>
+          <Btn onClick={() => setShowUpdate(true)} color="amber">프로젝트 수정하기</Btn>
           <Btn onClick={() => canChat && setShowCreateContent(true)} color="indigo" disabled={!canChat}>
             주제 생성
           </Btn>
-          <Btn onClick={() => setShowChat(true)} color="emerald">채팅하기</Btn>
+          <Btn onClick={() => setShowChat(true)} color="emerald" disabled={!canChat}>채팅하기</Btn>
           <Btn onClick={() => router.back()} color="slate">목록으로</Btn>
         </div>
       </div>
 
-      {/* Content list */}
       <h2 className="text-lg font-semibold text-slate-700 mb-4">콘텐츠 목록</h2>
-      {projectContents.contents.length === 0 ? (
+      {contents.length === 0 ? (
         <div className="text-center py-16 text-slate-400">
           <div className="text-4xl mb-3">📄</div>
           <p>콘텐츠가 없습니다.</p>
         </div>
       ) : (
         <div className="grid gap-3">
-          {projectContents.contents.map((c: ContentDto) => (
+          {contents.map((c: ContentDto) => (
             <div
               key={c.id}
               onClick={() => router.push(`/content?key=${c.key}`)}
@@ -72,9 +73,9 @@ export default function ProjectDetailContents({ projectKey }: { projectKey: stri
 
       {showUpdate && (
         <ProjectUpdateModal
-          project={{ key: projectContents.key, name: projectContents.name, openAiKey: projectContents.openAiKey,
-            prompt: projectContents.prompt, embedModel: projectContents.embedModel,
-            chatModel: projectContents.chatModel, dimensions: projectContents.dimensions, updatedUserId: userId }}
+          project={{ key: project.key, name: project.name, openAiKey: project.openAiKey ? project.openAiKey : "키없어요",
+            prompt: project.prompt ?? "", embedModel: project.embedModel ?? "",
+            chatModel: project.chatModel ?? "", dimensions: project.dimensions, updatedUserId: userId }}
           updatedUserId={userId}
           onClose={() => setShowUpdate(false)}
         />

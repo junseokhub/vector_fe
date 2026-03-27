@@ -7,7 +7,7 @@ export async function middleware(req: NextRequest, res: NextResponse) {
     const pathName = `${process.env.NEXT_PUBLIC_API_BASE_URL}/${url.pathname
       .split("/")
       .slice(2)
-      .join("/")}`;
+      .join("/")}${url.search}`;
     return NextResponse.rewrite(pathName);
   }
 

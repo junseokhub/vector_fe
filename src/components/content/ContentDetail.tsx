@@ -37,7 +37,6 @@ export default function ContentDetail({ contentKey }: { contentKey: string }) {
   return (
     <div className="max-w-2xl mx-auto py-8">
       <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
-        {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6 pb-6 border-b border-slate-100">
           {isEditing ? (
             <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} className={`${inputCls} text-lg font-bold`} />
@@ -65,13 +64,11 @@ export default function ContentDetail({ contentKey }: { contentKey: string }) {
           </div>
         </div>
 
-        {/* Key */}
         <div className="mb-4">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Key</span>
           <p className="font-mono text-sm text-slate-600 mt-1 bg-slate-50 px-3 py-2 rounded-lg">{content.key}</p>
         </div>
 
-        {/* Answer */}
         <div className="mb-4">
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">답변</span>
           {isEditing ? (

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
-import ProjectDetailContents from "@/components/project/ProjectDetailContents";
-import Layout from "@/components/layout/Layout.tsx";
+import ContentList from "@/components/content/ContentList";
+import Layout from "@/components/layout/Layout";
 
 export default function ProjectDetailPage() {
   const { query } = useRouter();
@@ -16,7 +16,7 @@ export default function ProjectDetailPage() {
 
   return (
     <Layout>
-      <ProjectDetailContents projectKey={projectKey} />
+      <ContentList projectKey={projectKey} />
     </Layout>
   );
 }
