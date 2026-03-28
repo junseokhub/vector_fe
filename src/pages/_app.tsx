@@ -5,6 +5,7 @@ import RecoilNexus from "recoil-nexus";
 import { authState } from "@/state/authAtom";
 import { useEffect } from "react";
 import { storage } from "@/utils/storage";
+import { Toaster } from "react-hot-toast";
 
 function AuthInitializer() {
   const setAuth = useSetRecoilState(authState);
@@ -31,6 +32,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <RecoilRoot>
       <RecoilNexus />
       <AuthInitializer />
+      <Toaster position="top-center"/>
       <Component {...pageProps} />
     </RecoilRoot>
   );

@@ -1,25 +1,35 @@
 import { useState, useEffect } from "react";
-import { storage } from "@/lib/storage";
+import client from "@/api/client";
 import type { ContentDto } from "@/types";
-
+import toast from "react-hot-toast";
+ 
 export function useGetContentDetail(contentKey: string) {
   const [contentDetail, setContentDetail] = useState<ContentDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
+ 
   useEffect(() => {
     if (!contentKey) return;
-    const token = storage.get("accessToken");
-    if (!token) { setError("로그인이 필요합니다."); setLoading(false); return; }
+    
+    const fecthContentDetail = async () => {
+      setLoading(true);
+      try {
+        const data = await client
+          .get(`/api/content/detail/${contentKey}`)
+          .json<ContentDto>();
 
-    fetch(`/api/content/detail/${contentKey}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => { if (!res.ok) throw new Error("데이터 로딩 실패"); return res.json(); })
-      .then((data) => { setContentDetail(data); setError(null); })
-      .catch((e) => { setError(e.message); setContentDetail(null); })
-      .finally(() => setLoading(false));
-  }, [contentKey]);
-
+        setContentDetail(data);
+        setError(null);
+      } catch (e) {
+        toast.error("불러오기 실패");
+        setError(e instanceof Error ? e.message : "알 수 없는 오류 발생");
+        setContentDetail(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+  fecthContentDetail();
+      
+}, [contentKey]);
   return { contentDetail, loading, error };
 }

@@ -1,9 +1,16 @@
 import { useLogin } from "@/hooks/user/useLogin";
+import { storage } from "@/lib/storage";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function LoginForm() {
   const { email, setEmail, password, setPassword, handleSubmit } = useLogin();
   const router = useRouter();
+
+    useEffect(() => {
+      const token = storage.get("accessToken");
+      if (token) router.replace("/project");
+    }, [router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900">

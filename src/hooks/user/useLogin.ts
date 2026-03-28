@@ -5,6 +5,8 @@ import client from "@/api/client";
 import { authState } from "@/state/authAtom";
 import { storage } from "@/lib/storage";
 import type { LoginParams, LoginResponse } from "@/types";
+import { HTTPError } from "ky";
+import toast from "react-hot-toast";
 
 export function useLogin() {
   const setAuth = useSetRecoilState(authState);
@@ -23,8 +25,15 @@ export function useLogin() {
       storage.set("userId", data.id.toString());
       storage.set("userEmail", data.email);
       router.push("/project");
-    } catch (e) {
-      alert("로그인 실패: " + (e as Error).message);
+    } catch (err) {
+    if (err instanceof HTTPError) {
+      const status = err.response.status;
+      if (status === 400) {
+        toast.error("이메일 또는 비밀번호가 올바르지 않습니다.");
+      } else {
+        toast.error("로그인 중 오류가 발생했습니다.");
+      }
+    }
     }
   };
 

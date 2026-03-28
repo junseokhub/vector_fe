@@ -24,10 +24,9 @@ export default function ProjectList() {
   return (
     <div className="py-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-800 ml-60">프로젝트 목록</h1>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="flex mr-60 items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]"
+          className="flex ml-auto items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 hover:shadow-lg hover:shadow-indigo-200 active:scale-[0.98]"
         >
           <span className="text-lg">+</span> 새 프로젝트
         </button>
@@ -44,7 +43,10 @@ export default function ProjectList() {
           {projects.map((p: Project) => (
             <div
               key={p.id}
-              onClick={() => { setSelectedProjectKey(p.key); router.push(`/project/detail?key=${encodeURIComponent(p.key)}`); }}
+              onClick={() => {
+                setSelectedProjectKey(p.key);
+                router.push(`/project/detail?key=${encodeURIComponent(p.key)}`);
+              }}
               className={`group flex items-center justify-between p-5 rounded-2xl border cursor-pointer transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ${
                 p.mine
                   ? "bg-indigo-50 border-indigo-200 hover:border-indigo-300"
@@ -70,7 +72,10 @@ export default function ProjectList() {
         <ProjectCreateModal
           createdUserId={userId}
           onClose={() => setIsModalOpen(false)}
-          onCreate={async (params) => { await handleSubmit(params); setIsModalOpen(false); }}
+          onCreate={async (params) => {
+            await handleSubmit(params);
+            setIsModalOpen(false);
+          }}
         />
       )}
     </div>
