@@ -60,7 +60,6 @@ client.interceptors.response.use(
             });
         }
 
-        // ✅ 이미 진행 중인 refreshPromise 대기
         const newToken = await refreshPromise;
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
         return client(originalRequest);
