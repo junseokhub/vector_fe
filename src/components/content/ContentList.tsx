@@ -13,8 +13,15 @@ import type { ContentDto } from "@/types";
 
 const ChatModal = dynamic(() => import("@/components/chat/ChatModal"), { ssr: false });
 
-export default function Conten({ projectKey }: { projectKey: string }) {
+export default function Content({ projectKey }: { projectKey: string }) {
   const { id: userId } = useRecoilValue(authState);
+
+  if (userId === null) return <Status text="인증 정보 확인 중..." />;
+
+  return <ContentInner projectKey={projectKey} userId={userId} />;
+}
+
+function ContentInner({ projectKey, userId }: { projectKey: string; userId: number }) {
   const { contents, loading: contentsLoading, error: contentsError } = useGetContentInProject(projectKey);
   const { project, loading: projectLoading, error: projectError } = useGetProject(projectKey);
   const router = useRouter();
@@ -73,9 +80,16 @@ export default function Conten({ projectKey }: { projectKey: string }) {
 
       {showUpdate && (
         <ProjectUpdateModal
-          project={{ key: project.key, name: project.name, openAiKey: project.openAiKey ? project.openAiKey : "키없어요",
-            prompt: project.prompt ?? "", embedModel: project.embedModel ?? "",
-            chatModel: project.chatModel ?? "", dimensions: project.dimensions, updatedUserId: userId }}
+          project={{ 
+            key: project.key, 
+            name: project.name, 
+            openAiKey: project.openAiKey ? project.openAiKey : "키없어요",
+            prompt: project.prompt ?? "", 
+            embedModel: project.embedModel ?? "",
+            chatModel: project.chatModel ?? "", 
+            dimensions: project.dimensions, 
+            updatedUserId: userId
+          }}
           updatedUserId={userId}
           onClose={() => setShowUpdate(false)}
         />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Modal from "@/components/ui/Modal";
 import type { ProjectUpdateParams, ProjectUpdateResponse } from "@/types";
 import { useUpdateProject } from "@/hooks/project/useCreateProject";
@@ -22,15 +22,19 @@ function getChangedFields<T extends object>(original: T, updated: T): Partial<T>
 const inputCls = "w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-slate-800 transition text-sm";
 
 export default function ProjectUpdateModal({ project, onClose, onUpdate, updatedUserId }: Props) {
-  const original: ProjectUpdateParams = {
-    name: project.name || "", openAiKey: project.openAiKey || "",
-    prompt: project.prompt || "", embedModel: project.embedModel || "",
-    chatModel: project.chatModel || "", dimensions: project.dimensions || 3072,
-    updatedUserId,
-  };
+  const original = useMemo(() => ({
+    key: project.key,
+    name: project.name,
+    openAiKey: project.openAiKey || "키없어요",
+    prompt: project.prompt ?? "",
+    embedModel: project.embedModel ?? "",
+    chatModel: project.chatModel ?? "",
+    dimensions: project.dimensions,
+    updatedUserId: updatedUserId,
+  }), [project, updatedUserId]);
 
   const [form, setForm] = useState(original);
-  useEffect(() => setForm(original), [project]);
+  useEffect(() => setForm(original), [project, original]);
 
   const { handleUpdate, loading, error } = useUpdateProject();
   const set = (k: keyof ProjectUpdateParams) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
