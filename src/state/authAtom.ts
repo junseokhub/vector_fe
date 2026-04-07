@@ -7,8 +7,8 @@ const isServer = typeof window === "undefined";
 export const authState = atom<AuthState>({
   key: "authStateVector",
   default: {
-    accessToken: "",
-    id: 0,
+    accessToken: null,
+    id: null,
   },
   effects: [
     ({ setSelf }) => {

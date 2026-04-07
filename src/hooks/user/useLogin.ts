@@ -18,23 +18,23 @@ export function useLogin() {
     e.preventDefault();
     try {
       const data = await client
-        .post("/api/auth/login", { json: { email, password } as LoginParams })
+        .post("auth/login", { json: { email, password } as LoginParams })
         .json<LoginResponse>();
+
       setAuth({ accessToken: data.accessToken, id: data.id });
       storage.set("accessToken", data.accessToken);
       storage.set("userId", data.id.toString());
       router.push("/project");
     } catch (err) {
-    if (err instanceof HTTPError) {
-      const status = err.response.status;
-      if (status === 400) {
-        toast.error("이메일 또는 비밀번호가 올바르지 않습니다.");
-      } else {
-        toast.error("로그인 중 오류가 발생했습니다.");
+      if (err instanceof HTTPError) {
+        const status = err.response.status;
+        if (status === 400) {
+          toast.error("이메일 또는 비밀번호가 올바르지 않습니다.");
+        } else {
+          toast.error("로그인 중 오류가 발생했습니다.");
+        }
       }
     }
-    }
   };
-
   return { email, setEmail, password, setPassword, handleSubmit };
 }

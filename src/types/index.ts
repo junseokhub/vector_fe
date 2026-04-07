@@ -1,9 +1,8 @@
 // ─── Auth ────────────────────────────────────────────────────────────────────
-export interface AuthState {
-  accessToken: string;
-  id: number;
-}
-
+export type AuthState = {
+  accessToken: string | null;
+  id: number | null;
+};
 export interface LoginParams { 
   email: string;
   password: string

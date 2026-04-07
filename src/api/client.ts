@@ -1,4 +1,4 @@
-import ky from "ky";
+import ky, { HTTPError } from "ky";
 import { getRecoil, setRecoil } from "recoil-nexus";
 import { authState } from "@/state/authAtom";
 import { storage } from "@/utils/storage";
@@ -19,11 +19,39 @@ const client = ky.create({
       },
     ],
     afterResponse: [
-      async (_request, _options, response) => {
-        const newAccessToken = response.headers.get("new-access-token");
-        if (newAccessToken) {
-          setRecoil(authState, (prev) => ({ ...prev, accessToken: newAccessToken }));
+      async (request, options, response) => {
+        if (response.status === 401) {
+          const expiredToken =
+            getRecoil(authState)?.accessToken ?? storage.get("accessToken");
+          if (!expiredToken) return response;
+
+          try {
+            const reissued = await ky
+              .post(`${process.env.NEXT_PUBLIC_API_URL}/auth/reissue`, {
+                headers: { Authorization: `Bearer ${expiredToken}` },
+              })
+              .json<{ accessToken: string }>();
+
+            // 새 토큰 저장
+            setRecoil(authState, (prev) => ({
+              ...prev,
+              accessToken: reissued.accessToken,
+            }));
+            storage.set("accessToken", reissued.accessToken);
+
+            // 원래 요청 새 토큰으로 재시도
+            request.headers.set("Authorization", `Bearer ${reissued.accessToken}`);
+            return ky(request);
+          } catch {
+            // Refresh Token도 만료 → 강제 로그아웃
+            setRecoil(authState, { accessToken: null, id: null });
+            storage.remove("accessToken");
+            storage.remove("userId");
+            window.location.href = "/login";
+          }
         }
+
+        return response;
       },
     ],
     beforeError: [(error) => error],

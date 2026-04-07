@@ -1,5 +1,5 @@
 import type { AppProps } from "next/app";
-import "@/app/globals.css";
+import "@/styles/globals.css";
 import { RecoilRoot } from "recoil";
 import RecoilNexus from "recoil-nexus";
 import { Toaster } from "react-hot-toast";
