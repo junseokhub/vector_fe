@@ -25,7 +25,6 @@ export function useChat(projectKey: string, userId: number) {
       const { data } = await client.post<{ output: string }>('/api/chat', {
         text,
         projectKey,
-        userId,
         sessionId,
       });
       setMessages((prev) => [...prev, { role: 'assistant', text: data.output }]);

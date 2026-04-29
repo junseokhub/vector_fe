@@ -9,6 +9,11 @@ import { useCreateProject } from "@/hooks/project/useCreateProject";
 import ProjectCreateModal from "./ProjectCreateModal";
 import type { Project } from "@/types";
 
+const platformBadgeMap = {
+  OPENAI: "bg-emerald-100 text-emerald-700",
+  OLLAMA: "bg-violet-100 text-violet-700",
+} as const;
+
 export default function ProjectList() {
   const { id: userId } = useRecoilValue(authState);
   if (userId === null) return null;
@@ -54,12 +59,20 @@ function ProjectListInner({ userId }: { userId: number }) {
               }`}
             >
               <div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-semibold text-slate-800 text-lg">{p.name}</h3>
                   {p.mine && <span className="text-yellow-500">⭐️</span>}
+                  {p.llmPlatform && (
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${platformBadgeMap[p.llmPlatform]}`}>
+                      {p.llmPlatform === "OPENAI" ? "OpenAI" : "Ollama"}
+                    </span>
+                  )}
                 </div>
                 <p className="text-sm text-slate-400 mt-0.5">
                   생성일: {new Date(p.createdAt).toLocaleDateString()}
+                  {p.embedModel && (
+                    <span className="ml-2 text-xs text-slate-300">· {p.embedModel}</span>
+                  )}
                 </p>
               </div>
               <span className="text-slate-300 group-hover:text-slate-500 transition-colors text-xl">→</span>

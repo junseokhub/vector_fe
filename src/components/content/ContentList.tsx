@@ -35,14 +35,32 @@ function ContentInner({ projectKey, userId }: { projectKey: string; userId: numb
   if (projectError) return <Status text={`오류: ${projectError}`} isError />;
   if (!project) return <Status text="프로젝트를 찾을 수 없습니다." />;
 
-  const canChat = !!project.openAiKey;
+  const isOllama = project.llmPlatform === "OLLAMA";
+  const canChat = !!project.embedModel && (isOllama || !!project.apiKey);
+
+  const platformBadge = project.llmPlatform
+    ? { OPENAI: { label: "OpenAI", cls: "bg-emerald-100 text-emerald-700" }, OLLAMA: { label: "Ollama", cls: "bg-violet-100 text-violet-700" } }[project.llmPlatform]
+    : null;
 
   return (
     <div className="py-6">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6 pb-6 border-b border-slate-200">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">{project.name}</h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-2xl font-bold text-slate-800">{project.name}</h1>
+            {platformBadge && (
+              <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${platformBadge.cls}`}>
+                {platformBadge.label}
+              </span>
+            )}
+          </div>
           <span className="text-xs font-mono text-slate-400 mt-1 block">Key: {project.key}</span>
+          {project.embedModel && (
+            <span className="text-xs text-slate-400 mt-0.5 block">
+              Embed: {project.embedModel} · {project.dimensions}d
+              {project.chatModel && ` · Chat: ${project.chatModel}`}
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap gap-2">
           <Btn onClick={() => setShowUpdate(true)} color="amber">프로젝트 수정하기</Btn>
@@ -53,6 +71,14 @@ function ContentInner({ projectKey, userId }: { projectKey: string; userId: numb
           <Btn onClick={() => router.back()} color="slate">목록으로</Btn>
         </div>
       </div>
+
+      {!canChat && (
+        <div className="mb-4 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-700">
+          {!project.embedModel
+            ? "임베딩 모델을 설정해야 콘텐츠 생성과 채팅이 활성화됩니다."
+            : "OpenAI API Key를 설정해야 콘텐츠 생성과 채팅이 활성화됩니다."}
+        </div>
+      )}
 
       <h2 className="text-lg font-semibold text-slate-700 mb-4">콘텐츠 목록</h2>
       {contents.length === 0 ? (
@@ -80,28 +106,37 @@ function ContentInner({ projectKey, userId }: { projectKey: string; userId: numb
 
       {showUpdate && (
         <ProjectUpdateModal
-          project={{ 
-            key: project.key, 
-            name: project.name, 
-            openAiKey: project.openAiKey ? project.openAiKey : "키없어요",
-            prompt: project.prompt ?? "", 
+          project={{
+            key: project.key,
+            name: project.name,
+            apiKey: project.apiKey ?? "",
+            prompt: project.prompt ?? "",
             embedModel: project.embedModel ?? "",
-            chatModel: project.chatModel ?? "", 
-            dimensions: project.dimensions, 
-            updatedUserId: userId
+            chatModel: project.chatModel ?? "",
+            dimensions: project.dimensions,
+            llmPlatform: project.llmPlatform ?? "OPENAI",
+            updatedUserId: userId,
           }}
           updatedUserId={userId}
           onClose={() => setShowUpdate(false)}
         />
       )}
-      {showCreateContent && <ContentCreateModal projectKey={projectKey} onClose={() => setShowCreateContent(false)} />}
-      {showChat && <ChatModal projectKey={projectKey} userId={userId} onClose={() => setShowChat(false)} />}
+      {showCreateContent && (
+        <ContentCreateModal projectKey={projectKey} onClose={() => setShowCreateContent(false)} />
+      )}
+      {showChat && (
+        <ChatModal projectKey={projectKey} userId={userId} onClose={() => setShowChat(false)} />
+      )}
     </div>
   );
 }
 
 function Status({ text, isError = false }: { text: string; isError?: boolean }) {
-  return <div className={`text-center py-20 font-medium ${isError ? "text-red-500" : "text-slate-500"}`}>{text}</div>;
+  return (
+    <div className={`text-center py-20 font-medium ${isError ? "text-red-500" : "text-slate-500"}`}>
+      {text}
+    </div>
+  );
 }
 
 type BtnColor = "indigo" | "amber" | "emerald" | "slate";
@@ -112,10 +147,23 @@ const colorMap: Record<BtnColor, string> = {
   slate: "bg-slate-200 hover:bg-slate-300 text-slate-700",
 };
 
-function Btn({ children, onClick, color, disabled }: { children: React.ReactNode; onClick: () => void; color: BtnColor; disabled?: boolean }) {
+function Btn({
+  children,
+  onClick,
+  color,
+  disabled,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  color: BtnColor;
+  disabled?: boolean;
+}) {
   return (
-    <button onClick={onClick} disabled={disabled}
-      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed ${colorMap[color]}`}>
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed ${colorMap[color]}`}
+    >
       {children}
     </button>
   );
